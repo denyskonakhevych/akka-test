@@ -25,31 +25,16 @@ public class FileAggregator {
     }
 
     public void aggregate() {
-        final int totalNumberOfLines = getTotalNumberOfLines(inputFile) - 1; // minus headers
+        final int totalNumberOfLines = getTotalNumberOfLines(inputFile);
         final AtomicInteger counter = new AtomicInteger(totalNumberOfLines);
         final ConcurrentMap<String, AtomicInteger> aggregatedResult = new ConcurrentHashMap<>(totalNumberOfLines);
         try (CSVReader csvReader = new CSVReader(new FileReader(inputFile), ';')) {
-            String[] row = null;
+            String[] row;
             while ((row = csvReader.readNext()) != null) {
-                if (row.length != 2)
-                    continue;
-                String id = row[0];
-                Integer value = tryParseAmount(row[1]);
-                if (value == null)
-                    continue;
-
-                processor.tell(new FileRecordDataWork(aggregatedResult, id, value, counter), null);
+                processor.tell(new FileRecordDataWork(aggregatedResult, row, counter), null);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    private static Integer tryParseAmount(String stringValue) {
-        try {
-            return new Integer(stringValue);
-        } catch (NumberFormatException e) {
-            return null;
         }
     }
 

@@ -21,13 +21,28 @@ public class CounterActor extends UntypedActor {
     public void onReceive(Object message) throws Exception {
         if (message instanceof FileRecordDataWork) {
             FileRecordDataWork work = (FileRecordDataWork) message;
-            final String id = work.getId();
-            final Integer value = work.getValue();
-            final ConcurrentMap<String, AtomicInteger> aggregatedResult = work.getAggregatedResult();
-            checkOrInitId(aggregatedResult, id);
-            aggregatedResult.get(id).addAndGet(value);
+            aggregateRow(work);
             if (work.getCounter().decrementAndGet() <= 0)
-                onEndListener.tell(new AggregatedData(aggregatedResult), getSelf());
+                onEndListener.tell(new AggregatedData(work.getAggregatedResult()), getSelf());
+        }
+    }
+
+    private void aggregateRow(FileRecordDataWork work) {
+        if (work.getRow().length != 2)
+            return;
+        final String id = work.getRow()[0];
+        final Integer value = tryParseAmount(work.getRow()[1]);
+        final ConcurrentMap<String, AtomicInteger> aggregatedResult = work.getAggregatedResult();
+        checkOrInitId(aggregatedResult, id);
+        if (value != null)
+            aggregatedResult.get(id).addAndGet(value);
+    }
+
+    private static Integer tryParseAmount(String stringValue) {
+        try {
+            return new Integer(stringValue);
+        } catch (NumberFormatException e) {
+            return null;
         }
     }
 

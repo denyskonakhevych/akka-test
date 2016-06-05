@@ -9,17 +9,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class FileRecordDataWork {
 
     private ConcurrentMap<String, AtomicInteger> aggregatedResult;
-    private String id;
-    private Integer value;
+    private String[] row;
     private AtomicInteger counter;
 
     public FileRecordDataWork() {
     }
 
-    public FileRecordDataWork(ConcurrentMap<String, AtomicInteger> aggregatedResult, String id, Integer value, AtomicInteger counter) {
+    public FileRecordDataWork(ConcurrentMap<String, AtomicInteger> aggregatedResult, String[] row, AtomicInteger counter) {
         this.aggregatedResult = aggregatedResult;
-        this.id = id;
-        this.value = value;
+        this.row = row;
         this.counter = counter;
     }
 
@@ -31,27 +29,19 @@ public class FileRecordDataWork {
         this.aggregatedResult = aggregatedResult;
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public Integer getValue() {
-        return value;
-    }
-
-    public void setValue(Integer value) {
-        this.value = value;
-    }
-
     public AtomicInteger getCounter() {
         return counter;
     }
 
     public void setCounter(AtomicInteger counter) {
         this.counter = counter;
+    }
+
+    public String[] getRow() {
+        return row;
+    }
+
+    public void setRow(String[] row) {
+        this.row = row;
     }
 }
